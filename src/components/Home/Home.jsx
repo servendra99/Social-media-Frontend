@@ -7,9 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, getFollowingPosts } from "../../Actions/User";
 import Loader from "../Loader/Loading";
 import { Typography } from "@mui/material";
+import { useAlert } from "react-alert";
 
 const Home = () => {
+  console.log("home");
   const dispatch = useDispatch();
+  const alert = useAlert();
 
   const { loading, posts, error } = useSelector(
     (state) => state.postOfFollowing
@@ -19,11 +22,28 @@ const Home = () => {
     (state) => state.allUsers
   );
 
+  const { error: likeError, message } = useSelector((state) => state.like);
+
   useEffect(() => {
-    console.log("hello");
     dispatch(getFollowingPosts());
     dispatch(getAllUsers());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      alert.error(error);
+      dispatch({ type: "clearErrors" });
+    }
+
+    if (likeError) {
+      alert.error(likeError);
+      dispatch({ type: "clearErrors" });
+    }
+    if (message) {
+      alert.success(message);
+      dispatch({ type: "clearMessage" });
+    }
+  }, [alert, error, message, likeError, dispatch]);
 
   return loading == true || usersLoading == true ? (
     <Loader />
@@ -31,7 +51,7 @@ const Home = () => {
     <div className="home">
       <div className="homeleft">
         {posts && posts.length > 0 ? (
-          posts.map((post) => {
+          posts.map((post) => (
             <Post
               key={post._id}
               postId={post._id}
@@ -40,12 +60,12 @@ const Home = () => {
               likes={post.likes}
               comments={post.comments}
               ownerImage={post.owner.avatar.url}
-              ownername={post.owner.name}
+              ownerName={post.owner.name}
               ownerId={post.owner._id}
-            />;
-          })
+            />
+          ))
         ) : (
-          <Typography variants="h6"> No Posts yet</Typography>
+          <Typography variant="h6">No posts yet</Typography>
         )}
       </div>
       <div className="homeright">
