@@ -13,7 +13,7 @@ import { Avatar, Button, Typography, Dialog } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCommentOnPost, likePost } from "../../Actions/Post";
+import { addCommentOnPost, getMyPosts, likePost } from "../../Actions/Post";
 import { getFollowingPosts } from "../../Actions/User";
 import User from "../User/User";
 import CommentCard from "../CommentCard/CommentCard";
@@ -44,7 +44,7 @@ const Post = ({
     await dispatch(likePost(postId));
 
     if (isAccount) {
-      console.log("Bring me my posts");
+      dispatch(getMyPosts());
     } else {
       dispatch(getFollowingPosts());
     }

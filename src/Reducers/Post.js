@@ -46,5 +46,35 @@ export const likeReducer = createReducer(
     clearMessage: (state) => {
       state.message = null;
     },
+    newPostRequesnewPost: (state) => {
+      state.loading = true;
+    },
+    newPostSuccess: (state, action) => {
+      state.loading = false;
+      state.message = action.payload;
+    },
+    newPostFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+  }
+);
+export const myPostReducer = createReducer(
+  {},
+  {
+    myPostsRequest: (state) => {
+      state.loading = true;
+    },
+    myPostsSuccess: (state, action) => {
+      state.loading = false;
+      state.posts = action.payload;
+    },
+    myPostsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    clearErrors: (state) => {
+      state.error = null;
+    },
   }
 );

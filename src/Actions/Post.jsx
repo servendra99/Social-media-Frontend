@@ -68,3 +68,48 @@ export const deleteCommentOnPost = (id, commentId) => async (dispatch) => {
     });
   }
 };
+
+export const getMyPosts = () => async (dispatch) => {
+  try {
+    dispatch({ type: "myPostsRequest" });
+
+    const { data } = await axios.get("/api/v1/my/posts");
+
+    dispatch({ type: "myPostsSuccess", payload: data.posts });
+  } catch (error) {
+    dispatch({
+      type: "myPostsFailure",
+      payload: error.response.data.message,
+    });
+  }
+};
+
+export const createNewPost = (caption, image) => async (dispatch) => {
+  try {
+    dispatch({
+      type: "newPostRequest",
+    });
+
+    const { data } = await axios.post(
+      `/api/v1/post/upload`,
+      {
+        caption,
+        image,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({
+      type: "newPostSuccess",
+      payload: data.message,
+    });
+  } catch (error) {
+    dispatch({
+      type: "newPostFailure",
+      payload: error.response.data.message,
+    });
+  }
+};
