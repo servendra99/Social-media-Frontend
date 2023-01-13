@@ -13,8 +13,14 @@ import { Avatar, Button, Typography, Dialog } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCommentOnPost, getMyPosts, likePost } from "../../Actions/Post";
-import { getFollowingPosts } from "../../Actions/User";
+import {
+  addCommentOnPost,
+  getMyPosts,
+  likePost,
+  updatePost,
+  deletePost,
+} from "../../Actions/Post";
+import { getFollowingPosts, loadUser } from "../../Actions/User";
 import User from "../User/User";
 import CommentCard from "../CommentCard/CommentCard";
 
@@ -28,7 +34,7 @@ const Post = ({
   ownername,
   ownerId,
   isDelete = false,
-  isAccount = false,
+  isAccount = caption,
 }) => {
   const dispatch = useDispatch();
 
@@ -36,10 +42,12 @@ const Post = ({
   const [likesUser, setLikesUser] = useState(false);
   const [commentValue, setCommentValue] = useState("");
   const [commentToggle, setCommentToggle] = useState(false);
+  const [captionValue, setCaptionValue] = useState(caption);
+  const [captionToggle, setCaptionToggle] = useState(false);
 
   const { user } = useSelector((state) => state.user);
 
-  const handleLike = async () => {
+  const handleLike = async (e) => {
     setLiked(!liked);
     await dispatch(likePost(postId));
 
@@ -54,7 +62,7 @@ const Post = ({
     await dispatch(addCommentOnPost(postId, commentValue));
 
     if (isAccount) {
-      // dispatch(getMyPosts());
+      dispatch(getMyPosts());
     } else {
       dispatch(getFollowingPosts());
     }
@@ -68,11 +76,24 @@ const Post = ({
     });
   }, [likes, user._id]);
 
+  const updateCaptionHandler = (e) => {
+    e.preventDefault();
+
+    dispatch(updatePost(captionValue, postId));
+    dispatch(getMyPosts());
+  };
+
+  const deletePostHandler = async () => {
+    await dispatch(deletePost(postId));
+    dispatch(getMyPosts());
+    dispatch(loadUser());
+  };
+
   return (
     <div className="post">
       <div className="postHeader">
         {isAccount && (
-          <Button>
+          <Button onClick={() => setCaptionToggle(!captionToggle)}>
             <MoreVert />
           </Button>
         )}
@@ -119,7 +140,7 @@ const Post = ({
         </Button>
 
         {isDelete && (
-          <Button>
+          <Button onClick={deletePostHandler}>
             <DeleteOutline />
           </Button>
         )}
@@ -174,6 +195,29 @@ const Post = ({
           ) : (
             <Typography>No comments Yet</Typography>
           )}
+        </div>
+      </Dialog>
+
+      <Dialog
+        open={captionToggle}
+        onClose={() => setCaptionToggle(!captionToggle)}
+      >
+        <div className="DialogBox">
+          <Typography variant="h4"> Update</Typography>
+
+          <form className="commentForm" onSubmit={updateCaptionHandler}>
+            <input
+              type="text"
+              value={captionValue}
+              onChange={(e) => setCaptionValue(e.target.value)}
+              placeholder="Caption Here"
+              required
+            />
+            <Button type="submit" variant="contained">
+              {" "}
+              Add
+            </Button>
+          </form>
         </div>
       </Dialog>
     </div>
